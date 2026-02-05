@@ -1,0 +1,29 @@
+## resonator (RZ)
+## Parameters from Izhikevich (2003)
+
+neuron:
+  type: RZ
+  model: izhikevich
+  parameters:
+    a: 0.1
+    b: 0.26
+    c: -65   # unit: mV
+    d: 2
+
+stimulus:
+  base: 0
+  components:
+  - kind: step
+    amplitude: 2      #dimension: 1
+    start_ms: 200
+    duration_ms: 300
+
+  - kind: step
+    amplitude: 10      #dimension: 1
+    start_ms: 300
+    duration_ms: 2
+
+simulation:
+  dt_ms: 0.01
+  t_end_ms: 500
+  integrator: euler
