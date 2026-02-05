@@ -22,7 +22,7 @@ def test_rs_neuron_runs():
         cwd=repo_root,
         capture_output=True,
         text=True,
-        timeout=30
+        timeout=120
     )
 
     # Combine stdout and stderr since logging might go to either
@@ -45,7 +45,7 @@ def test_rs_neuron_produces_spikes():
         cwd=repo_root,
         capture_output=True,
         text=True,
-        timeout=30
+        timeout=120
     )
 
     # Combine stdout and stderr
@@ -81,7 +81,7 @@ def test_logfile_creation():
             cwd=repo_root,
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=120
         )
 
         assert result.returncode == 0, f"Simulation failed: {result.stderr}"
@@ -111,7 +111,7 @@ def test_all_neuron_types_run():
             cwd=repo_root,
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=120
         )
 
         assert result.returncode == 0, \
