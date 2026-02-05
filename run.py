@@ -3,27 +3,6 @@ import logging
 from models.izhikevich import IzhikevichNeuron
 
 
-def main():
-    args = parse_arguments()
-
-    # Set non-interactive backend for headless environments (prevents GUI crashes)
-    if args.headless:
-        import matplotlib
-        matplotlib.use('Agg')
-
-    configure_logging(args)
-
-    neuron = IzhikevichNeuron.from_yaml(args.config)
-    if args.verbose:
-        neuron.verbose = True
-
-    neuron.run(show_plot=not args.headless)
-
-
-if __name__ == "__main__":
-    main()
-
-
 def parse_arguments():
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
@@ -63,3 +42,25 @@ def configure_logging(args):
         log_config['filename'] = args.logfile
         log_config['filemode'] = 'w'
     logging.basicConfig(**log_config)
+
+
+# MAIN FUNCTION
+def main():
+    args = parse_arguments()
+
+    # Set non-interactive backend for headless environments (prevents GUI crashes)
+    if args.headless:
+        import matplotlib
+        matplotlib.use('Agg')
+
+    configure_logging(args)
+
+    neuron = IzhikevichNeuron.from_yaml(args.config)
+    if args.verbose:
+        neuron.verbose = True
+
+    neuron.run(show_plot=not args.headless)
+
+
+if __name__ == "__main__":
+    main()
