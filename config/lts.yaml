@@ -14,7 +14,7 @@ stimulus:
   base: 0
   components:
   - kind: step
-    amplitude: 10      # dimension:t (changing with time)
+    amplitude: 10      # arbitrary units (dimensionless, scaled to match Izhikevich paper)
     start_ms: 100
     duration_ms: 700
 

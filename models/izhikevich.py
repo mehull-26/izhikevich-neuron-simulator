@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 from brian2 import *
 import yaml
-from brian2 import ms
+import logging
 
 
 class IzhikevichNeuron:
-    def __init__(self, a, b, c, d, stimulus, dt, t_end, integrator):
+    def __init__(self, a, b, c, d, stimulus, dt, t_end, integrator, verbose=False):
         self.a = a
         self.b = b
         self.c = c
@@ -16,6 +16,7 @@ class IzhikevichNeuron:
         self.dt = dt
         self.t_end = t_end
         self.integrator = integrator
+        self.verbose = verbose
 
     @classmethod
     def from_yaml(cls, path):
@@ -53,9 +54,15 @@ class IzhikevichNeuron:
         dt_ms = _require(cfg, ["simulation", "dt_ms"])
         t_end_ms = _require(cfg, ["simulation", "t_end_ms"])
         integrator = _require(cfg, ["simulation", "integrator"])
+        verbose = cfg.get("simulation", {}).get("verbose", False)
 
         _require_positive("dt_ms", dt_ms)
         _require_positive("t_end_ms", t_end_ms)
+
+        # Warn if timestep is large
+        if verbose and dt_ms > 0.1:
+            logging.warning(
+                f"dt = {dt_ms} ms is large (>0.1 ms); results may be inaccurate")
 
         return cls(
             a=a,
@@ -65,10 +72,11 @@ class IzhikevichNeuron:
             stimulus=stimulus,
             dt=dt_ms * ms,
             t_end=t_end_ms * ms,
-            integrator=integrator
+            integrator=integrator,
+            verbose=verbose
         )
 
-    def run(self):
+    def run(self, show_plot=True):
         start_scope()
         defaultclock.dt = self.dt
 
@@ -96,6 +104,7 @@ class IzhikevichNeuron:
         I_t = TimedArray(I_values, dt=self.dt)
 
         # Izhikevich equations
+        # Current I_t(t) is dimensionless (arbitrary units scaled to match paper)
         eqs = '''
         dv/dt = (0.04*v**2 + 5*v + 140 - u + I_t(t)) / ms : 1
         du/dt = a*(b*v - u) / ms : 1
@@ -126,8 +135,32 @@ class IzhikevichNeuron:
         d = self.d
 
         M = StateMonitor(G, 'v', record=True)
+        spike_mon = SpikeMonitor(G)
+
+        # Log stimulus events
+        if self.verbose:
+            if stim["base"] != 0:
+                logging.info(f"baseline current: {stim['base']}")
+            for i, comp in enumerate(stim["components"]):
+                start_ms = comp["start"] / ms
+                end_ms = start_ms + comp["duration"] / ms
+                logging.info(
+                    f"stimulus step {i+1}: {comp['amplitude']:+.2f} from {start_ms:.1f} to {end_ms:.1f} ms")
 
         run(self.t_end)
+
+        # Log spike summary
+        if self.verbose:
+            spike_count = len(spike_mon.t)
+            logging.info(f"simulation complete: {spike_count} spikes detected")
+            if spike_count > 0:
+                for i, spike_time in enumerate(spike_mon.t, 1):
+                    logging.info(f"  spike {i}: {spike_time/ms:.3f} ms")
+                firing_rate = spike_count / (self.t_end / second)
+                logging.info(f"average firing rate: {firing_rate:.2f} Hz")
+            elif stim["base"] > 0 or any(c["amplitude"] > 0 for c in stim["components"]):
+                logging.warning(
+                    "no spikes detected with positive current input")
 
         # plot
         fig, ax = plt.subplots(2, 1, sharex=True, figsize=(
@@ -142,7 +175,11 @@ class IzhikevichNeuron:
 
         plt.title("Izhikevich neuron")
         plt.tight_layout()
-        plt.show()
+
+        if show_plot:
+            plt.show()
+        else:
+            plt.close(fig)
 
 
 # Helper functions

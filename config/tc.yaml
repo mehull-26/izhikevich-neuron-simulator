@@ -11,10 +11,10 @@ neuron:
     d: 0.05
 
 stimulus:
-  base: -10
+  base: -10          # arbitrary units (dimensionless)
   components:
     - kind: step
-      amplitude: 10
+      amplitude: 10  # arbitrary units (dimensionless, scaled to match Izhikevich paper)
       start_ms: 100
       duration_ms: 700
 
