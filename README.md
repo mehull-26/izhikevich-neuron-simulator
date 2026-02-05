@@ -6,7 +6,7 @@ A fast and efficient implementation of the [Izhikevich simple spiking neuron mod
 
 ### Installation
 
-Requires Python 3.9+ and Brian2.
+Requires Python 3.10+ and Brian2.
 
 ```bash
 pip install -r requirements.txt
