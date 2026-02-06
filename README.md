@@ -1,6 +1,6 @@
 # Simple Izhikevich Neuron Simulator
 
-A fast and efficient implementation of the [Izhikevich simple spiking neuron model](https://www.izhikevich.org/publications/spikes.htm) (2003) for exploring diverse neuronal firing dynamics. Built for students and researchers to quickly experiment with different neuron behaviors through simple YAML configuration files.
+A paper implementation of the [Izhikevich simple spiking neuron model](https://www.izhikevich.org/publications/spikes.htm) (2003) for exploring diverse neuronal firing dynamics. Built for students and researchers to quickly experiment with different neuron behaviors through simple YAML configuration files.
 
 ## Quick Start
 
